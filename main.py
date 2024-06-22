@@ -13,9 +13,11 @@ import pandas as pd
 with open('10k_most_common_passwords.txt') as f:
     weak_passwords = set(f.read().splitlines())
 
+# Función para verificar si una contraseña es débil
 def es_password_debil(password):
     return password in weak_passwords
 
+# Función para verificar la validez de una contraseña según criterios de complejidad
 def es_password_valido(password):
     if len(password) < 8:
         return False
@@ -29,6 +31,7 @@ def es_password_valido(password):
         return False
     return True
 
+# Función para crear la base de datos y la tabla de registros si no existen
 def crear_bd():
     conn = sqlite3.connect('registros.db')
     conn.execute('''CREATE TABLE IF NOT EXISTS REGISTROS
@@ -39,24 +42,28 @@ def crear_bd():
                  NOTA TEXT NOT NULL);''')
     conn.close()
 
+# Clase LoginApp: maneja la interfaz de inicio de sesión y registro de usuarios
 class LoginApp:
     def __init__(self, root):
+        # Atributos de la clase LoginApp
         self.root = root
         self.root.title("Login usuario")
 
-        self.nombreUsuario = tk.StringVar()
-        self.passwordUsuario = tk.StringVar()
-        self.usuarios = []
+        self.nombreUsuario = tk.StringVar()  # Variable para el nombre de usuario
+        self.passwordUsuario = tk.StringVar()  # Variable para la contraseña
+        self.usuarios = []  # Lista para almacenar usuarios
         self.failed_attempts = 0  # Contador de intentos fallidos
 
-        self.create_gui()
-        crear_bd()
+        self.create_gui()  # Crear la interfaz gráfica de usuario
+        crear_bd()  # Crear la base de datos
 
+    # Método para crear la interfaz gráfica de usuario
     def create_gui(self):
         mainFrame = tk.Frame(self.root)
         mainFrame.pack()
         mainFrame.config(width=480, height=320)
 
+        # Etiquetas y campos de entrada
         titulo = tk.Label(mainFrame, text="Inicio de sesión", font=("Arial", 24))
         titulo.grid(column=0, row=0, padx=10, pady=10, columnspan=2)
 
@@ -79,29 +86,32 @@ class LoginApp:
         passwordEntry = tk.Entry(mainFrame, textvariable=self.passwordUsuario, show="*")
         passwordEntry.grid(column=1, row=4, pady=10)
 
+        # Botones de iniciar sesión y registrar
         iniciarSesionButton = ttk.Button(mainFrame, text="Iniciar Sesión", command=self.iniciar_sesion)
         iniciarSesionButton.grid(column=1, row=5, ipadx=5, ipady=5, padx=10, pady=10)
 
         registrarButton = ttk.Button(mainFrame, text="Registrar", command=self.registrar_usuario)
         registrarButton.grid(column=0, row=5, ipadx=5, ipady=5, padx=10, pady=10)
 
+    # Método para iniciar sesión
     def iniciar_sesion(self):
         for user in self.usuarios:
             if user.nombre == self.nombreUsuario.get():
                 if user.conectar(self.passwordUsuario.get()):
                     MessageBox.showinfo("Conectado", f"Se inició sesión en [{user.nombre}] con éxito.")
-                    self.failed_attempts = 0  # Reset failed attempts on success
+                    self.failed_attempts = 0  # Reiniciar contador de intentos fallidos
                     self.open_dashboard()
                 else:
                     self.failed_attempts += 1
                     MessageBox.showerror("Error", "Contraseña incorrecta.")
-                    time.sleep(self.failed_attempts * 2)  # Incremental delay
+                    time.sleep(self.failed_attempts * 2)  # Incrementar el tiempo de espera
                 break
         else:
             self.failed_attempts += 1
             MessageBox.showerror("Error", "No existen usuarios con ese nombre.")
-            time.sleep(self.failed_attempts * 2)  # Incremental delay
+            time.sleep(self.failed_attempts * 2)  # Incrementar el tiempo de espera
 
+    # Método para registrar un nuevo usuario
     def registrar_usuario(self):
         name = self.nombreUsuario.get()
         password = self.passwordUsuario.get()
@@ -120,17 +130,21 @@ class LoginApp:
         self.nombreUsuario.set("")
         self.passwordUsuario.set("")
 
+    # Método para abrir el dashboard
     def open_dashboard(self):
-        self.root.withdraw()  # Esconde la ventana de login
+        self.root.withdraw()  # Esconder la ventana de login
         dashboard = tk.Toplevel(self.root)
         Dashboard(dashboard, self)
 
+    # Método para limpiar los campos de entrada
     def clear_fields(self):
         self.nombreUsuario.set("")
         self.passwordUsuario.set("")
 
+# Clase Dashboard: maneja la interfaz del panel principal después de iniciar sesión
 class Dashboard:
     def __init__(self, root, login_app):
+        # Atributos de la clase Dashboard
         self.root = root
         self.login_app = login_app
         self.root.title("Dashboard")
@@ -139,6 +153,7 @@ class Dashboard:
         self.df = None  # DataFrame para almacenar el contenido cargado
         self.selected_rows = []  # Lista para almacenar las filas seleccionadas
 
+        # Crear la interfaz del dashboard
         label = tk.Label(self.root, text="Registros", font=("Arial", 24))
         label.pack(padx=10, pady=10)
 
@@ -164,6 +179,7 @@ class Dashboard:
         logout_button = ttk.Button(self.root, text="Cerrar Sesión", command=self.logout)
         logout_button.pack(padx=10, pady=10)
 
+    # Método para seleccionar un archivo
     def seleccionar_archivo(self):
         self.selected_file = filedialog.askopenfilename(
             title="Seleccionar archivo",
@@ -172,6 +188,7 @@ class Dashboard:
         if self.selected_file:
             MessageBox.showinfo("Archivo seleccionado", f"Has seleccionado el archivo: {self.selected_file}")
 
+    # Método para cargar el contenido del archivo seleccionado
     def cargar_archivo(self):
         if not self.selected_file:
             MessageBox.showwarning("Advertencia", "Primero selecciona un archivo.")
@@ -179,6 +196,7 @@ class Dashboard:
             MessageBox.showinfo("Cargar archivo", f"Cargando archivo: {self.selected_file}")
             self.mostrar_contenido_archivo()
 
+    # Método para mostrar el contenido del archivo en el Treeview
     def mostrar_contenido_archivo(self):
         try:
             # Limpiar el contenido actual del treeview
@@ -200,6 +218,7 @@ class Dashboard:
         except Exception as e:
             MessageBox.showerror("Error", f"Ocurrió un error al cargar el archivo: {e}")
 
+    # Método para guardar la selección en la base de datos
     def guardar_seleccion(self):
         selected_items = self.tree.selection()
         self.selected_rows = []
@@ -210,6 +229,7 @@ class Dashboard:
         self.guardar_en_bd()
         MessageBox.showinfo("Guardar Selección", f"Se han guardado {len(self.selected_rows)} filas seleccionadas.")
 
+    # Método para guardar los registros seleccionados en la base de datos
     def guardar_en_bd(self):
         conn = sqlite3.connect('registros.db')
         c = conn.cursor()
@@ -218,6 +238,7 @@ class Dashboard:
         conn.commit()
         conn.close()
 
+    # Método para ver los registros guardados
     def ver_registros_guardados(self):
         registros_ventana = tk.Toplevel(self.root)
         registros_ventana.title("Registros Guardados")
@@ -232,17 +253,20 @@ class Dashboard:
         for row in self.selected_rows:
             tree.insert("", tk.END, values=row)
 
+    # Método para cerrar sesión y volver a la ventana de login
     def logout(self):
         self.root.destroy()  # Cierra la ventana del dashboard
         self.login_app.clear_fields()
         main_window.deiconify()  # Muestra de nuevo la ventana de login
 
+# Punto de entrada principal del programa
 if __name__ == "__main__":
     main_window = tk.Tk()
     app = LoginApp(main_window)
     user1 = usuario("Lucas", "1234")
     app.usuarios.append(user1)
     main_window.mainloop()
+
 
 
 

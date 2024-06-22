@@ -1,0 +1,56 @@
+@startuml Diagrama de clases TP1 - Diseño de sistemas 1
+
+class LoginApp {
+    +Tk root
+    +StringVar nombreUsuario
+    +StringVar passwordUsuario
+    +List<usuario> usuarios
+    +int failed_attempts
+    +__init__(root: Tk)
+    +create_gui()
+    +iniciar_sesion()
+    +registrar_usuario()
+    +open_dashboard()
+    +clear_fields()
+}
+
+class Dashboard {
+    +Toplevel root
+    +LoginApp login_app
+    +str selected_file
+    +DataFrame df
+    +List<tuple> selected_rows
+    +__init__(root: Toplevel, login_app: LoginApp)
+    +seleccionar_archivo()
+    +cargar_archivo()
+    +mostrar_contenido_archivo()
+    +guardar_seleccion()
+    +guardar_en_bd()
+    +ver_registros_guardados()
+    +logout()
+}
+
+class usuario {
+    +str nombre
+    +str password
+    +bool conectado
+    +int intentos
+    +__init__(nombre: str, password: str)
+    +conectar(password: str) : bool
+    +desconectar()
+    +__str__() : str
+}
+
+class tratamientoArchivos {
+    +extraer_datos_pdf(nombre_archivo: str) : str
+    +crear_dataframe(texto: str) : DataFrame
+    +extraer_datos_xlsx(nombre_archivo: str) : DataFrame
+    +extraer_datos_csv(nombre_archivo: str) : DataFrame
+}
+
+LoginApp -> Dashboard
+Dashboard -> usuario
+Dashboard -> tratamientoArchivos
+
+
+@enduml

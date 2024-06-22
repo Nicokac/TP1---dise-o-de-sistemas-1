@@ -1,0 +1,11 @@
+@startuml DER - Diseño de sistemas 1
+
+entity "REGISTROS" {
+    + ID: INTEGER PRIMARY KEY AUTOINCREMENT
+    + NOMBRE: TEXT
+    + APELLIDO: TEXT
+    + NOMBRE_MATERIA: TEXT
+    + NOTA: TEXT
+}
+
+@enduml

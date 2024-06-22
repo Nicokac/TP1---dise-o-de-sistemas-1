@@ -2,6 +2,7 @@ import pandas as pd
 from PyPDF2 import PdfReader
 import openpyxl
 
+# Función para extraer texto de un archivo PDF
 def extraer_datos_pdf(nombre_archivo):
     try:
         lector = PdfReader(nombre_archivo)
@@ -20,6 +21,7 @@ def extraer_datos_pdf(nombre_archivo):
         print(f"Ocurrió un error: {e}")
     return None
 
+# Función para crear un DataFrame de pandas a partir de texto extraído
 def crear_dataframe(texto):
     lineas = texto.strip().split('\n')
     columnas = ['Nombre', 'Apellido', 'Nombre Materia', 'Nota']
@@ -27,6 +29,7 @@ def crear_dataframe(texto):
     df = pd.DataFrame(datos, columns=columnas)
     return df
 
+# Función para extraer datos de un archivo Excel (.xlsx)
 def extraer_datos_xlsx(nombre_archivo):
     try:
         df = pd.read_excel(nombre_archivo)
@@ -37,6 +40,7 @@ def extraer_datos_xlsx(nombre_archivo):
         print(f"Ocurrió un error: {e}")
     return None
 
+# Función para extraer datos de un archivo CSV
 def extraer_datos_csv(nombre_archivo):
     try:
         df = pd.read_csv(nombre_archivo)
@@ -47,6 +51,7 @@ def extraer_datos_csv(nombre_archivo):
         print(f"Ocurrió un error: {e}")
     return None
 
+# Función principal para probar la extracción de datos de diferentes archivos
 def main():
     # Extraer texto del PDF
     texto_extraido = extraer_datos_pdf('prueba.pdf')
@@ -67,5 +72,7 @@ def main():
         print("Archivo .csv extraído")
         print(df_csv)
 
+# Punto de entrada principal del programa
 if __name__ == "__main__":
     main()
+
