@@ -1,71 +1,81 @@
-import pandas as pd
-from PyPDF2 import PdfReader
-import openpyxl
+from tkinter import *
+from tkinter import ttk as ttk
+from usuarios import usuario
+from tkinter import messagebox as MessageBox
 
-def extraer_datos_pdf(nombre_archivo):
-    try:
-        lector = PdfReader(nombre_archivo)
-        if len(lector.pages) > 0:
-            pagina = lector.pages[0]
-            texto = pagina.extract_text()
-            if texto:
-                return texto
+root = Tk()
+nombreUsuario = StringVar()
+passwordUsuario = StringVar()
+usuarios = []
+
+def createGUI():
+
+    # Ventana principal
+    #root = Tk()
+    root.title("Login usuario")
+
+    # mainFrame
+    mainFrame = Frame(root)
+    mainFrame.pack()
+    mainFrame.config(width=480, height=320)#, bg="lightblue")
+
+    # textos y subtitulos
+    titulo = Label(mainFrame, text="Login de usuario con Python", font=("Arial",24))
+    titulo.grid(column=0, row=0, padx=10, pady=10, columnspan=2)
+
+    nombreLabel = Label(mainFrame, text="Nombre: ")
+    nombreLabel.grid(column=0,  row=1)
+    passwordLabel = Label(mainFrame, text="Contraseña: ")
+    passwordLabel.grid(column=0, row=2)
+
+    # entradas de texto
+    #nombreUsuario = StringVar()
+    nombreUsuario.set("")
+    nombreEntry = Entry(mainFrame, textvariable=nombreUsuario)
+    nombreEntry.grid(column=1, row=1)
+
+    #passwordUsuario = StringVar()
+    passwordUsuario.set("")
+    passwordEntry = Entry(mainFrame, textvariable=passwordUsuario, show="*")
+    passwordEntry.grid(column=1, row=2)
+
+    # Botones
+    iniciarSesionButton = ttk.Button(mainFrame, text="Iniciar Sesión", command=iniciarSesion)
+    iniciarSesionButton.grid(column=1, row=3, ipadx=5, ipady=5, padx=10, pady=10)
+
+    registrarButton = ttk.Button(mainFrame, text="Registrar", command=registrarUsuario)
+    registrarButton.grid(column=0, row=3, ipadx=5, ipady=5, padx=10, pady=10)
+
+    root.mainloop()
+
+def iniciarSesion():
+    #global passwordUsuario
+    for user in usuarios:
+        if user.nombre == nombreUsuario.get():
+            test = user.conectar(passwordUsuario.get())
+            if test:
+                MessageBox.showinfo("Conectado", f"Se inicio sesion en [{user.nombre}] con exito.")
             else:
-                print("No se pudo extraer el texto de la primera página.")
-        else:
-            print("El archivo PDF no contiene páginas.")
-    except FileNotFoundError:
-        print(f"Error: El archivo '{nombre_archivo}' no fue encontrado.")
-    except Exception as e:
-        print(f"Ocurrió un error: {e}")
-    return None
+                MessageBox.showerror("Error","Contraseña incorrecta.")
+            break
+    else:
+        MessageBox.showerror("Error","No existen usuarios con ese nombre.")
 
-def crear_dataframe(texto):
-    lineas = texto.strip().split('\n')
-    columnas = ['Nombre', 'Apellido', 'Nombre Materia', 'Nota']
-    datos = [linea.rsplit(maxsplit=4) for linea in lineas[1:]]
-    df = pd.DataFrame(datos, columns=columnas)
-    return df
+def registrarUsuario():
+    name = nombreUsuario.get()
+    password = passwordUsuario.get()
+    nuevoUsuario = usuario(name, password)
+    usuarios.append(nuevoUsuario)
+    MessageBox.showinfo("Registro exitoso", f"Se registró el usuario [{name}] con exito.")
+    nombreUsuario.set("")
+    passwordUsuario.set("")
 
-def extraer_datos_xlsx(nombre_archivo):
-    try:
-        df = pd.read_excel(nombre_archivo)
-        return df
-    except FileNotFoundError:
-        print(f"Error: El archivo '{nombre_archivo}' no fue encontrado.")
-    except Exception as e:
-        print(f"Ocurrió un error: {e}")
-    return None
-
-def extraer_datos_csv(nombre_archivo):
-    try:
-        df = pd.read_csv(nombre_archivo)
-        return df
-    except FileNotFoundError:
-        print(f"Error: El archivo '{nombre_archivo}' no fue encontrado.")
-    except Exception as e:
-        print(f"Ocurrió un error: {e}")
-    return None
-
-def main():
-    # Extraer texto del PDF
-    texto_extraido = extraer_datos_pdf('prueba.pdf')
-    if texto_extraido:
-        df_pdf = crear_dataframe(texto_extraido)
-        print("Archivo .pdf extraído")
-        print(df_pdf)
-
-    # Extraer datos del archivo .xlsx
-    df_xlsx = extraer_datos_xlsx('prueba.xlsx')
-    if df_xlsx is not None:
-        print("Archivo .xlsx extraído")
-        print(df_xlsx)
-    
-    # Extraer datos del archivo .csv
-    df_csv = extraer_datos_csv('prueba.csv')
-    if df_csv is not None:
-        print("Archivo .csv extraído")
-        print(df_csv)
+    #root.mainloop()
 
 if __name__ == "__main__":
-    main()
+    #user1 = usuario(inpout)
+    user1 = usuario("Lucas", "1234")
+    #usuarios = [user1]
+    usuarios.append(user1)
+    createGUI()
+
