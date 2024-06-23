@@ -1,3 +1,4 @@
+# Importación de librerias
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox as MessageBox
@@ -5,9 +6,11 @@ from tkinter import filedialog
 import re
 import time
 import sqlite3
+import pandas as pd
+
+# Importación de modulos
 from usuarios import usuario
 import tratamientoArchivos as ta
-import pandas as pd
 
 # Cargar lista de contraseñas débiles
 with open('10k_most_common_passwords.txt') as f:
