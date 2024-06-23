@@ -5,7 +5,7 @@ class LoginApp {
     +StringVar nombreUsuario
     +StringVar passwordUsuario
     +List<usuario> usuarios
-    +int failed_attempts
+    +int intentos_fallidos
     +__init__(root: Tk)
     +create_gui()
     +iniciar_sesion()

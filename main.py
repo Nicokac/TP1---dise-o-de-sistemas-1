@@ -52,7 +52,7 @@ class LoginApp:
         self.nombreUsuario = tk.StringVar()  # Variable para el nombre de usuario
         self.passwordUsuario = tk.StringVar()  # Variable para la contraseña
         self.usuarios = []  # Lista para almacenar usuarios
-        self.failed_attempts = 0  # Contador de intentos fallidos
+        self.intentos_fallidos = 0  # Contador de intentos fallidos
 
         self.create_gui()  # Crear la interfaz gráfica de usuario
         crear_bd()  # Crear la base de datos
@@ -99,17 +99,19 @@ class LoginApp:
             if user.nombre == self.nombreUsuario.get():
                 if user.conectar(self.passwordUsuario.get()):
                     MessageBox.showinfo("Conectado", f"Se inició sesión en [{user.nombre}] con éxito.")
-                    self.failed_attempts = 0  # Reiniciar contador de intentos fallidos
+                    self.intentos_fallidos = 0  # Reiniciar contador de intentos fallidos
                     self.open_dashboard()
                 else:
-                    self.failed_attempts += 1
+                    self.intentos_fallidos += 1
                     MessageBox.showerror("Error", "Contraseña incorrecta.")
-                    time.sleep(self.failed_attempts * 2)  # Incrementar el tiempo de espera
+                    print(f"Tiempo de espera: {self.intentos_fallidos * 2} segundos")
+                    time.sleep(self.intentos_fallidos * 2)  # Incrementar el tiempo de espera
                 break
         else:
-            self.failed_attempts += 1
+            self.intentos_fallidos += 1
             MessageBox.showerror("Error", "No existen usuarios con ese nombre.")
-            time.sleep(self.failed_attempts * 2)  # Incrementar el tiempo de espera
+            print(f"Tiempo de espera: {self.intentos_fallidos * 2} segundos")
+            time.sleep(self.intentos_fallidos * 2)  # Incrementar el tiempo de espera
 
     # Método para registrar un nuevo usuario
     def registrar_usuario(self):
