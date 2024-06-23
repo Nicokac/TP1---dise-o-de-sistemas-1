@@ -29,7 +29,7 @@ Este es un sistema de inicio de sesión y registro de usuarios desarrollado en P
    cd tu-repositorio
 
 ### **Crear entorno virtual:**
-
+-  ```bash
    python -m venv venv
 
 ### Activar entorno virtual:
