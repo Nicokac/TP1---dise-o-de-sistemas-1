@@ -33,15 +33,15 @@ Este es un sistema de inicio de sesión y registro de usuarios desarrollado en P
    python -m venv venv
 
 ### Activar entorno virtual:
-
+-  ```bash
    venv\Scripts\activate
 
 ### Instalar dependencias:
-
+-  ```bash
    pip install -r requirements.txt
 
 ### Ejecutar la aplicación:
-
+-  ```bash
    python main.py
  
 ## Uso:
