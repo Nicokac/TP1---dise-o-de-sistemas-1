@@ -17,9 +17,9 @@ class LoginApp {
 class Dashboard {
     +Toplevel root
     +LoginApp login_app
-    +str selected_file
+    +str archivo_seleccionado
     +DataFrame df
-    +List<tuple> selected_rows
+    +List<tuple> filas_seleccionadas
     +__init__(root: Toplevel, login_app: LoginApp)
     +seleccionar_archivo()
     +cargar_archivo()

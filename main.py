@@ -154,9 +154,9 @@ class Dashboard:
         self.login_app = login_app
         self.root.title("Dashboard")
         
-        self.selected_file = None
+        self.archivo_seleccionado = None
         self.df = None  # DataFrame para almacenar el contenido cargado
-        self.selected_rows = []  # Lista para almacenar las filas seleccionadas
+        self.filas_seleccionadas = []  # Lista para almacenar las filas seleccionadas
 
         # Crear la interfaz del dashboard
         label = tk.Label(self.root, text="Registros", font=("Arial", 24))
@@ -186,19 +186,19 @@ class Dashboard:
 
     # Método para seleccionar un archivo
     def seleccionar_archivo(self):
-        self.selected_file = filedialog.askopenfilename(
+        self.archivo_seleccionado = filedialog.askopenfilename(
             title="Seleccionar archivo",
             filetypes=(("Archivos PDF", "*.pdf"), ("Archivos Excel", "*.xlsx"), ("Archivos CSV", "*.csv"))
         )
-        if self.selected_file:
-            MessageBox.showinfo("Archivo seleccionado", f"Has seleccionado el archivo: {self.selected_file}")
+        if self.archivo_seleccionado:
+            MessageBox.showinfo("Archivo seleccionado", f"Has seleccionado el archivo: {self.archivo_seleccionado}")
 
     # Método para cargar el contenido del archivo seleccionado
     def cargar_archivo(self):
-        if not self.selected_file:
+        if not self.archivo_seleccionado:
             MessageBox.showwarning("Advertencia", "Primero selecciona un archivo.")
         else:
-            MessageBox.showinfo("Cargar archivo", f"Cargando archivo: {self.selected_file}")
+            MessageBox.showinfo("Cargar archivo", f"Cargando archivo: {self.archivo_seleccionado}")
             self.mostrar_contenido_archivo()
 
     # Método para mostrar el contenido del archivo en el Treeview
@@ -208,14 +208,14 @@ class Dashboard:
             for item in self.tree.get_children():
                 self.tree.delete(item)
             
-            if self.selected_file.endswith('.pdf'):
-                texto = ta.extraer_datos_pdf(self.selected_file)
+            if self.archivo_seleccionado.endswith('.pdf'):
+                texto = ta.extraer_datos_pdf(self.archivo_seleccionado)
                 if texto:
                     self.df = ta.crear_dataframe(texto)
-            elif self.selected_file.endswith('.xlsx'):
-                self.df = ta.extraer_datos_xlsx(self.selected_file)
-            elif self.selected_file.endswith('.csv'):
-                self.df = ta.extraer_datos_csv(self.selected_file)
+            elif self.archivo_seleccionado.endswith('.xlsx'):
+                self.df = ta.extraer_datos_xlsx(self.archivo_seleccionado)
+            elif self.archivo_seleccionado.endswith('.csv'):
+                self.df = ta.extraer_datos_csv(self.archivo_seleccionado)
 
             if self.df is not None:
                 for index, row in self.df.iterrows():
@@ -226,19 +226,19 @@ class Dashboard:
     # Método para guardar la selección en la base de datos
     def guardar_seleccion(self):
         selected_items = self.tree.selection()
-        self.selected_rows = []
+        self.filas_seleccionadas = []
         for item in selected_items:
             row_values = self.tree.item(item, "values")
-            self.selected_rows.append(row_values)
+            self.filas_seleccionadas.append(row_values)
         
         self.guardar_en_bd()
-        MessageBox.showinfo("Guardar Selección", f"Se han guardado {len(self.selected_rows)} filas seleccionadas.")
+        MessageBox.showinfo("Guardar Selección", f"Se han guardado {len(self.filas_seleccionadas)} filas seleccionadas.")
 
     # Método para guardar los registros seleccionados en la base de datos
     def guardar_en_bd(self):
         conn = sqlite3.connect('registros.db')
         c = conn.cursor()
-        for row in self.selected_rows:
+        for row in self.filas_seleccionadas:
             c.execute("INSERT INTO REGISTROS (NOMBRE, APELLIDO, NOMBRE_MATERIA, NOTA) VALUES (?, ?, ?, ?)", row)
         conn.commit()
         conn.close()
@@ -255,7 +255,7 @@ class Dashboard:
         tree.heading("Nota", text="Nota")
         tree.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
-        for row in self.selected_rows:
+        for row in self.filas_seleccionadas:
             tree.insert("", tk.END, values=row)
 
     # Método para cerrar sesión y volver a la ventana de login
