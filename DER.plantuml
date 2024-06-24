@@ -1,11 +1,30 @@
 @startuml DER - Diseño de sistemas 1
 
+entity "USUARIOS" {
+    + ID: INTEGER PRIMARY KEY AUTOINCREMENT
+    + NOMBRE: TEXT
+    + PASSWORD: TEXT
+}
+
 entity "REGISTROS" {
     + ID: INTEGER PRIMARY KEY AUTOINCREMENT
     + NOMBRE: TEXT
     + APELLIDO: TEXT
     + NOMBRE_MATERIA: TEXT
-    + NOTA: TEXT
+    + NOTA: INTEGER
+    + USUARIO_ID: INTEGER
 }
+
+entity "ARCHIVOS" {
+    + ID: INTEGER PRIMARY KEY AUTOINCREMENT
+    + NOMBRE_ARCHIVO: TEXT
+    + TIPO: TEXT
+    + FECHA_CARGA: DATETIME
+    + USUARIO_ID: INTEGER
+}
+
+USUARIOS ||--o{ REGISTROS : "contiene"
+USUARIOS ||--o{ ARCHIVOS : "sube"
+
 
 @enduml
