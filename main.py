@@ -1,4 +1,4 @@
-# Importación de librerias
+# Importación de librerías
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox as MessageBox
@@ -7,8 +7,10 @@ import re
 import time
 import sqlite3
 import pandas as pd
+import datetime
+import os
 
-# Importación de modulos
+# Importación de módulos
 from usuarios import usuario
 import tratamientoArchivos as ta
 
@@ -34,9 +36,18 @@ def es_password_valido(password):
         return False
     return True
 
+# Función para crear un nombre único para la base de datos
+def generar_nombre_bd():
+    # Crear la carpeta 'registros' si no existe
+    if not os.path.exists('registros'):
+        os.makedirs('registros')
+    # Generar un nombre de archivo único basado en la fecha y hora actual
+    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    return os.path.join('registros', f'registros_{timestamp}.db')
+
 # Función para crear la base de datos y la tabla de registros si no existen
-def crear_bd():
-    conn = sqlite3.connect('registros.db')
+def crear_bd(nombre_bd):
+    conn = sqlite3.connect(nombre_bd)
     conn.execute('''CREATE TABLE IF NOT EXISTS REGISTROS
                  (ID INTEGER PRIMARY KEY AUTOINCREMENT,
                  NOMBRE TEXT NOT NULL,
@@ -58,7 +69,6 @@ class LoginApp:
         self.intentos_fallidos = 0  # Contador de intentos fallidos
 
         self.create_gui()  # Crear la interfaz gráfica de usuario
-        crear_bd()  # Crear la base de datos
 
     # Método para crear la interfaz gráfica de usuario
     def create_gui(self):
@@ -157,6 +167,7 @@ class Dashboard:
         self.archivo_seleccionado = None
         self.df = None  # DataFrame para almacenar el contenido cargado
         self.filas_seleccionadas = []  # Lista para almacenar las filas seleccionadas
+        self.nombre_bd = generar_nombre_bd()
 
         # Crear la interfaz del dashboard
         label = tk.Label(self.root, text="Registros", font=("Arial", 24))
@@ -183,6 +194,8 @@ class Dashboard:
 
         logout_button = ttk.Button(self.root, text="Cerrar Sesión", command=self.logout)
         logout_button.pack(padx=10, pady=10)
+        
+        crear_bd(self.nombre_bd)  # Crear la base de datos
 
     # Método para seleccionar un archivo
     def seleccionar_archivo(self):
@@ -236,7 +249,7 @@ class Dashboard:
 
     # Método para guardar los registros seleccionados en la base de datos
     def guardar_en_bd(self):
-        conn = sqlite3.connect('registros.db')
+        conn = sqlite3.connect(self.nombre_bd)
         c = conn.cursor()
         for row in self.filas_seleccionadas:
             c.execute("INSERT INTO REGISTROS (NOMBRE, APELLIDO, NOMBRE_MATERIA, NOTA) VALUES (?, ?, ?, ?)", row)
@@ -271,6 +284,7 @@ if __name__ == "__main__":
     user1 = usuario("Lucas", "1234")
     app.usuarios.append(user1)
     main_window.mainloop()
+
 
 
 
