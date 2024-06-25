@@ -1,3 +1,4 @@
+Este TP fue realizado por: Lucas Sanchez y Nicolás Kachuk
 # Sistema de Registro de Usuarios y Manejo de Archivos
 
 ## Descripción
